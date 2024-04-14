@@ -23,7 +23,8 @@
     "html-webpack-plugin": "^5.6.0",
     "webpack": "^5.75.0",
     "webpack-cli": "^5.0.0",
-    "webpack-dev-server": "^4.11.1"
+    "webpack-dev-server": "^4.11.1",
+    "dayjs": "1.11.10"
   },
   "browserslist": [
     "last 2 versions",

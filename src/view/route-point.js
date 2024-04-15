@@ -1,5 +1,5 @@
 import { AbstractView } from '../framework/view/abstract-view';
-import { humanizeDateTime, humanizeShortDate, humanizeTime, getPointDuration } from '../util';
+import { humanizeDateTime, humanizeShortDate, humanizeTime, getPointDuration } from '../utils/point';
 
 const createPointOffersTemplate = ( { pointOffers } ) => {
   const offerItems = pointOffers.reduce((accumulator, offer) => (

@@ -1,6 +1,6 @@
 import { render, RenderPosition } from './framework/render';
 import Destination from './view/destination';
-import Filter from './view/filter';
+import FilterPresenter from './presenter/filter-presenter';
 import RoutePresenter from './presenter/route-presenter';
 import MockService from './service/mock-service';
 import DestinationsModel from './model/destination-model';
@@ -24,7 +24,9 @@ const routePresenter = new RoutePresenter({
   pointsModel
 });
 
+const filterPresenter = new FilterPresenter( { container: siteFilterContainer, pointsModel } );
+
 render(new Destination(), siteDestinationContainer, RenderPosition.AFTERBEGIN);
-render(new Filter(), siteFilterContainer);
 
 routePresenter.init();
+filterPresenter.init();

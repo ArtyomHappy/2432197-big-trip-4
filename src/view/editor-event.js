@@ -1,4 +1,4 @@
-import { createElement } from '../render';
+import { AbstractView } from '../framework/view/abstract-view';
 import { capitalize, humanizeDateTime } from '../util';
 
 const CITIES = ['Amsterdam', 'Chamonix', 'Geneva', 'Paris', 'Rome', 'London'];
@@ -118,26 +118,37 @@ const createRedactorEventTemplate = ({point, pointDestination, pointOffers}) => 
   </li>`);
 };
 
-export default class RedactorEventView{
-  constructor({point = EMPTY_POINT, pointDestination, pointOffers}){
-    this.point = point;
-    this.pointDestination = pointDestination;
-    this.pointOffers = pointOffers;
+export default class EditorEvent extends AbstractView {
+  #point = null;
+  #pointDestination = null;
+  #pointOffers = null;
+  #handleRedactorSubmit = null;
+  #handleRedactorReset = null;
+
+  constructor( { point = EMPTY_POINT, pointDestination, pointOffers, onFormSubmit, onResetClick } ) {
+    super();
+
+    this.#point = point;
+    this.#pointDestination = pointDestination;
+    this.#pointOffers = pointOffers;
+    this.#handleRedactorSubmit = onFormSubmit;
+    this.#handleRedactorReset = onResetClick;
+
+    this.element.querySelector('form').addEventListener('submit', this.#redactorSubmitHandler);
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#redactorResetHandler);
   }
 
-  getTemplate(){
-    return createRedactorEventTemplate({point: this.point, pointDestination: this.pointDestination, pointOffers: this.pointOffers });
+  get template() {
+    return createRedactorEventTemplate( { point: this.#point, pointDestination: this.#pointDestination, pointOffers: this.#pointOffers } );
   }
 
-  getElement(){
-    if(!this.element){
-      this.element = createElement(this.getTemplate());
-    }
+  #redactorSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleRedactorSubmit();
+  };
 
-    return this.element;
-  }
-
-  removeElement(){
-    this.element = null;
-  }
+  #redactorResetHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleRedactorReset();
+  };
 }

@@ -1,4 +1,4 @@
-import { render, RenderPosition } from './render';
+import { render, RenderPosition } from './framework/render';
 import Destination from './view/destination';
 import Filter from './view/filter';
 import RoutePresenter from './presenter/route-presenter';
@@ -6,17 +6,6 @@ import MockService from './service/mock-service';
 import DestinationsModel from './model/destination-model';
 import OffersModel from './model/offers-model';
 import PointsModel from './model/points-model';
-
-// const siteDestinationContainer = document.querySelector('.trip-main');
-// const siteFilterContainer = document.querySelector('.trip-controls__filters');
-// const siteSortContainer = document.querySelector('.trip-events');
-// const routePresenter = new RoutePresenter({routeContainer: siteSortContainer});
-
-// render(new Destination(), siteDestinationContainer, RenderPosition.AFTERBEGIN);
-// render(new Filter(), siteFilterContainer);
-// render(new Sorting(), siteSortContainer);
-
-// routePresenter.init();
 
 const siteDestinationContainer = document.querySelector('.trip-main');
 const siteFilterContainer = document.querySelector('.trip-controls__filters');

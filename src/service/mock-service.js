@@ -1,7 +1,7 @@
-import { generateDestination } from '../mock/destination';
-import { generateOffer } from '../mock/offer';
-import { generatePoint } from '../mock/tripPoint';
-import { getRandomNumber, getRandomArrayElement } from '../util';
+import { generateDestination } from '../mocks/destination';
+import { generateOffer } from '../mocks/offer';
+import { generatePoint } from '../mocks/points';
+import { getRandomNumber, getRandomArrayElement } from '../utils/general';
 
 const ROUTE_TYPES = ['taxi', 'bus', 'train', 'ship', 'check-in', 'restaurant', 'drive', 'flight', 'sightseeing'];
 

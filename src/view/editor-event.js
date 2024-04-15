@@ -1,5 +1,5 @@
 import { AbstractView } from '../framework/view/abstract-view';
-import { capitalize, humanizeDateTime } from '../util';
+import { capitalize, humanizeDateTime } from '../utils/point';
 
 const CITIES = ['Amsterdam', 'Chamonix', 'Geneva', 'Paris', 'Rome', 'London'];
 const ROUTE_TYPES = ['taxi','bus', 'train', 'ship', 'check-in','restaurant','drive', 'flight', 'sightseeing',];

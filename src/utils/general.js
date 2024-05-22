@@ -31,4 +31,8 @@ function getLastWord(string) {
   return wordsList.at(-1);
 }
 
-export { getRandomNumber, getRandomArrayElement, capitalize, generateDescription, getLastWord };
+function update(items, updated) {
+  return items.map((item) => item.id === updated.id ? updated : item);
+}
+
+export { getRandomNumber, getRandomArrayElement, capitalize, generateDescription, getLastWord, update };

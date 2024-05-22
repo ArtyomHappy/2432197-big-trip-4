@@ -1,8 +1,9 @@
 import RouteInfo from '../view/route-info';
-import EditorEvent from '../view/editor-event';
-import RoutePoint from '../view/route-point';
 import Sorting from '../view/sorting';
-import { render, replace } from '../framework/render';
+import { render } from '../framework/render';
+import { update } from '../utils/general';
+import RoutePointPresenter from './route-point-presenter';
+import EmptyList from '../view/empty-list';
 
 export default class TripPresenter {
   #tripContainer = null;
@@ -10,6 +11,8 @@ export default class TripPresenter {
   #destinationsModel = null;
   #offersModel = null;
   #points = [];
+  #pointPresenters = new Map();
+  #pointsModel = null;
 
   constructor( {tripContainer, destinationsModel, offersModel, pointsModel} ) {
     this.#tripContainer = tripContainer;
@@ -19,53 +22,52 @@ export default class TripPresenter {
     this.#points = [...pointsModel.get()];
   }
 
-  init(){
+  init() {
+    this.#renderTrip();
+  }
+
+  #renderTrip() {
+    if(this.#points.length === 0){
+      render(new EmptyList(), this.#tripContainer);
+      return;
+    }
+    this.#renderSort();
+    this.#renderPointList();
+    this.#renderPoints();
+  }
+
+  #renderSort() {
     render(new Sorting(), this.#tripContainer);
+  }
+
+  #renderPointList() {
     render(this.#pointList, this.#tripContainer);
+  }
+
+  #renderPoints() {
     this.#points.forEach((point) => {
       this.#renderPoint(point);
     });
   }
 
-  #renderPoint(point){
-    const pointComponent = new RoutePoint({
-      point,
-      pointDestination: this.#destinationsModel.getById(point.destination),
-      pointOffers: this.#offersModel.getByType(point.type),
-      onRedactorClick: pointRedactorClickHandler,
-    }
-    );
-    const redactorComponent = new EditorEvent({
-      point,
-      pointDestination: this.#destinationsModel.getById(point.destination),
-      pointOffers: this.#offersModel.getByType(point.type),
-      onFormSubmit: pointSubmitHandler,
-      onResetClick: resetButtonClickHandler,
+  #renderPoint(point) {
+    const pointPresenter = new RoutePointPresenter({
+      container: this.#pointList.element,
+      destinationsModel: this.#destinationsModel,
+      offersModel: this.#offersModel,
+      handleDataChange: this.#handlePointChange,
+      handleModeChange: this.#handleModeChange,
     });
-
-    const onEscape = (evt) =>{
-      if(evt.key === 'Escape'){
-        evt.preventDefault();
-        replace(pointComponent, redactorComponent);
-        document.removeEventListener('keydown', onEscape);
-      }
-    };
-
-    function pointRedactorClickHandler(){
-      replace(redactorComponent, pointComponent);
-      document.addEventListener('keydown', onEscape);
-    }
-
-    function pointSubmitHandler(){
-      replace(pointComponent, redactorComponent);
-      document.removeEventListener('keydown', onEscape);
-    }
-
-    function resetButtonClickHandler(){
-      replace(pointComponent, redactorComponent);
-      document.removeEventListener('keydown', onEscape);
-    }
-
-    render(pointComponent, this.#pointList.element);
+    pointPresenter.init(point);
+    this.#pointPresenters.set(point.id, pointPresenter);
   }
+
+  #handlePointChange = (updatePoint) => {
+    this.#points = update(this.#points, updatePoint);
+    this.#pointPresenters.get(updatePoint.id).init(updatePoint);
+  };
+
+  #handleModeChange = () => {
+    this.#pointPresenters.forEach((presenter) => presenter.resetView());
+  };
 }

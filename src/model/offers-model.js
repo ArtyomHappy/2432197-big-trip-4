@@ -1,6 +1,6 @@
 export default class OffersModel {
   #service = null;
-  #offers = null;
+  #offers = [];
 
   constructor(service) {
     this.#service = service;
@@ -12,6 +12,6 @@ export default class OffersModel {
   }
 
   getByType(type) {
-    return this.#offers.find((offer) => offer.type === type).offers;
+    return this.#offers.find((offer) => offer.type === type);
   }
 }

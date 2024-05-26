@@ -111,7 +111,7 @@ export default class RoutePointPresenter {
   };
 
   #pointSubmitHandler = (newPoint) => {
-    this.#point = newPoint;
+    this.#handleDataChange(newPoint);
     this.#switchToPoint();
   };
 

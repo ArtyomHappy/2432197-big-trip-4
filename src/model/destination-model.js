@@ -1,6 +1,6 @@
 export default class DestinationsModel {
   #service = null;
-  #destinations = null;
+  #destinations = [];
 
   constructor(service) {
     this.#service = service;

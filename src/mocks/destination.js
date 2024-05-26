@@ -21,7 +21,7 @@ function generateDestination() {
     id: crypto.randomUUID(),
     name: city,
     description: generateDescription(DESCRIPTION),
-    illustrations: Array.from({ length: getRandomNumber(1, 5) }, () => ({
+    illustrations: Array.from({ length: getRandomNumber(0, 5) }, () => ({
       'src': `https://loremflickr.com/248/152?random=${crypto.randomUUID()}`,
       'description': `${city} description`
     }))

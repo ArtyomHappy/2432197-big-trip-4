@@ -1,6 +1,6 @@
 export default class PointsModel {
   #service = null;
-  #points = null;
+  #points = [];
 
   constructor(service) {
     this.#service = service;

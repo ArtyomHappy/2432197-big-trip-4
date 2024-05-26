@@ -21,13 +21,13 @@ export default class MockService {
   get points() { return this.#points; }
 
   generateDestinations() {
-    return Array.from({ length: 5 }, () => generateDestination());
+    return Array.from({ length: 5 }, generateDestination);
   }
 
   generateOffers() {
     return ROUTE_TYPES.map((type) => ({
       type,
-      offers: Array.from({ length: getRandomNumber(0, 5) }, () => generateOffer(type))
+      offers: Array.from({ length: getRandomNumber(0, 5) }, generateOffer)
     }));
   }
 

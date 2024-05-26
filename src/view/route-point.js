@@ -1,8 +1,8 @@
 import { AbstractView } from '../framework/view/abstract-view';
 import { humanizeDateTime, humanizeShortDate, humanizeTime, getPointDuration } from '../utils/point';
 
-const createPointOffersTemplate = ( { pointOffers } ) => {
-  const offerItems = pointOffers.reduce((accumulator, offer) => (
+const createPointOffersTemplate = ( { current, selected } ) => {
+  const offerItems = current.filter((offer) => selected.includes(offer.id)).reduce((accumulator, offer) => (
     `${accumulator}<li class="event__offer">
     <span class="event__offer-title">${offer.title}</span>
     &plus;&euro;&nbsp;
@@ -14,7 +14,8 @@ const createPointOffersTemplate = ( { pointOffers } ) => {
 };
 
 const createTripPointTemplate = ( { point, pointDestination, pointOffers } ) => {
-  const { basePrice, dateFrom, dateTo, isFavorite, type } = point;
+  const { basePrice, dateFrom, dateTo, isFavorite, type, offers: selectedOffers} = point;
+  const currentOffers = pointOffers.offers;
   const favoriteClassName = isFavorite ? 'event__favorite-btn--active' : '';
   return (`<li class="trip-events__item">
   <div class="event">
@@ -35,7 +36,7 @@ const createTripPointTemplate = ( { point, pointDestination, pointOffers } ) => 
       &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
     </p>
     <h4 class="visually-hidden">Offers:</h4>
-    ${createPointOffersTemplate({pointOffers})}
+    ${createPointOffersTemplate({currentOffers, selectedOffers})}
     <button class="event__favorite-btn  ${favoriteClassName}" type="button">
       <span class="visually-hidden">Add to favorite</span>
       <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">

@@ -1,6 +1,8 @@
 import { AbstractView } from '../framework/view/abstract-view';
 import { humanizeDateTime } from '../utils/point';
 import { capitalize, getLastWord } from '../utils/general';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 
 const CITIES = ['Amsterdam', 'Chamonix', 'Geneva', 'Paris', 'Rome', 'London'];
 const ROUTE_TYPES = ['taxi','bus', 'train', 'ship', 'check-in','restaurant','drive', 'flight', 'sightseeing',];
@@ -31,7 +33,7 @@ const createCitiesTemplate = () => (
 const createOffersTemplate = ({current, selected}) => {
   const offerItems = current.reduce((accumulator, offer) => (
     `${accumulator}<div class="event__offer-selector">
-              <input class="event__offer-checkbox  visually-hidden" id="${offer.id}" type="checkbox" name="event-offer-${getLastWord(offer.title)}" ${selected.some((id) => id === offer.id) ? 'checked' : ''}>
+    <input class="event__offer-checkbox  visually-hidden" id="${offer.id}" type="checkbox" name="event-offer-${getLastWord(offer.title)}" data-offer-id="${offer.id}" ${selected.some((id) => id === offer.id) ? 'checked' : ''}>
               <label class="event__offer-label" for="${offer.id}">
                   <span class="event__offer-title">${offer.title}</span>
                   &plus;&euro;&nbsp;
@@ -129,6 +131,8 @@ export default class EditorEvent extends AbstractView {
   #pointOffers = null;
   #handleRedactorSubmit = null;
   #handleRedactorReset = null;
+  #datePickerFrom = null;
+  #datePickerTo = null;
 
   constructor( { point = EMPTY_POINT, pointDestination, pointOffers, onFormSubmit, onResetClick } ) {
     super();
@@ -168,6 +172,7 @@ export default class EditorEvent extends AbstractView {
     this.element.querySelector('.event__available-offers').addEventListener('change', this.#offerChangeHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationChangeHandler);
     this.element.querySelector('.event__type-group').addEventListener('change', this.#typeChangeHandler);
+    this.#setDatePickers();
   };
 
   #typeChangeHandler = (evt) => {
@@ -182,12 +187,11 @@ export default class EditorEvent extends AbstractView {
   };
 
   #offerChangeHandler = () => {
-    const selectedOffers = Array.from(this.element.querySelectorAll('.event__offer-checkbox:checked'))
-      .map(({id}) => id.split('-').slice(3).join('-'));
+    const selectedOffers = Array.from(this.element.querySelectorAll('.event__offer-checkbox:checked'));
     this._setState({
       point: {
         ...this._state.point,
-        offers: selectedOffers
+        offers: selectedOffers.map((element) => element.dataset.offerId)
       }
     });
   };
@@ -209,4 +213,71 @@ export default class EditorEvent extends AbstractView {
   static parseStateToPoint(state){
     return state.point;
   }
+
+  #datePickerFromChangeHandler = ([userDate]) => {
+    this._setState({
+      point: {
+        ...this._state.point,
+        dateFrom: userDate,
+      }
+    });
+    this.#datePickerFrom.set('maxDate', this._state.point.dateTo);
+  };
+
+  #datepickerToChangeHandler = ([userDate]) => {
+    this._setState({
+      point: {
+        ...this._state.point,
+        dateTo: userDate,
+      }
+    });
+    this.#datePickerTo.set('minDate', this._state.point.dateFrom);
+  };
+
+  #setDatePickers = () => {
+    const [dateFromElement, dateToElement] = this.element.querySelectorAll('.event__input--time');
+
+    this.#datePickerFrom = flatpickr(
+      dateFromElement,
+      {
+        dateFormat: 'd/m/y H:i',
+        enableTime: true,
+        locale: {
+          firstDayOfWeek: 1,
+        },
+        'time_24hr': true,
+        defaultDate: this._state.point.dateFrom,
+        maxDate: this._state.point.dateTo,
+        onChange: this.#datePickerFromChangeHandler,
+      },
+    );
+
+    this.#datePickerTo = flatpickr(
+      dateToElement,
+      {
+        dateFormat: 'd/m/y H:i',
+        enableTime: true,
+        locale: {
+          firstDayOfWeek: 1,
+        },
+        'time_24hr': true,
+        defaultDate: this._state.point.dateTo,
+        minDate: this._state.point.dateFrom,
+        onChange: this.#datepickerToChangeHandler,
+      },
+    );
+  };
+
+  removeElement = () => {
+    super.removeElement();
+    if(this.#datePickerFrom){
+      this.#datePickerFrom.destroy();
+      this.#datePickerFrom = null;
+    }
+
+    if(this.#datePickerTo){
+      this.#datePickerTo.destroy();
+      this.#datePickerTo = null;
+    }
+  };
 }

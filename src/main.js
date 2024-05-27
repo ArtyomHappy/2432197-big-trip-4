@@ -30,3 +30,5 @@ render(new Destination(), siteDestinationContainer, RenderPosition.AFTERBEGIN);
 
 routePresenter.init();
 filterPresenter.init();
+
+// 7.10. Меняй-удаляй: не успеваю до дедлайна, доделаю к защите

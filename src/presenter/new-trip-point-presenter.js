@@ -7,15 +7,26 @@ export default class NewTripPointPresenter {
   #destinationsModel = null;
   #offersModel = null;
   #editorComponent = null;
-  #handleDataChange = null;
-  #handleDestroy = null;
+  #onDataChange = null;
+  #onDestroy = null;
 
-  constructor({ container, handleDataChange, handleDestroy, offersModel, destinationsModel }) {
+  constructor({ container, onDataChange, onDestroy, offersModel, destinationsModel }) {
     this.#container = container;
-    this.#handleDataChange = handleDataChange;
-    this.#handleDestroy = handleDestroy;
+    this.#onDataChange = onDataChange;
+    this.#onDestroy = onDestroy;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
+  }
+
+  destroy({ isCanceled = true } = {}) {
+    if (!this.#editorComponent) {
+      return;
+    }
+
+    remove(this.#editorComponent);
+    this.#editorComponent = null;
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
+    this.#onDestroy({ isCanceled });
   }
 
   init() {
@@ -26,28 +37,17 @@ export default class NewTripPointPresenter {
     this.#editorComponent = new EditorEvent({
       destinations: this.#destinationsModel.destinations,
       offers: this.#offersModel.offers,
-      onFormSubmit: this.#onFormSubmit,
-      onDeleteClick: this.#onDeleteClick,
+      onFormSubmit: this.#handleFormSubmit,
+      onDeleteClick: this.#handleDeleteClick,
       type: EditingType.NEW
     });
 
     render(this.#editorComponent, this.#container, RenderPosition.AFTERBEGIN);
-    document.addEventListener('keydown', this.#onEscape);
-  }
-
-  destroy({ isCanceled = true } = {}) {
-    if (!this.#editorComponent) {
-      return;
-    }
-
-    remove(this.#editorComponent);
-    this.#editorComponent = null;
-    document.removeEventListener('keydown', this.#onEscape);
-    this.#handleDestroy({ isCanceled });
+    document.addEventListener('keydown', this.#escKeyDownHandler);
   }
 
   setAborting() {
-    const reset = () => {
+    const resetState = () => {
       this.#editorComponent.updateElement({
         isDisabled: false,
         isSaving: false,
@@ -55,7 +55,7 @@ export default class NewTripPointPresenter {
       });
     };
 
-    this.#editorComponent.shake(reset);
+    this.#editorComponent.shake(resetState);
   }
 
   setSaving() {
@@ -65,22 +65,20 @@ export default class NewTripPointPresenter {
     });
   }
 
-  #onEscape = (evt) => {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
-      evt.preventDefault();
-      this.destroy();
-    }
-  };
-
-  #onFormSubmit = (point) => {
-    this.#handleDataChange(
+  #handleFormSubmit = (point) => {
+    this.#onDataChange(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
       point,
     );
   };
 
-  #onDeleteClick = () => {
-    this.destroy();
+  #handleDeleteClick = () => { this.destroy(); };
+
+  #escKeyDownHandler = (evt) => {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      evt.preventDefault();
+      this.destroy();
+    }
   };
 }

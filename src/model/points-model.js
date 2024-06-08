@@ -18,11 +18,11 @@ export default class PointsModel extends Observable {
   async addPoint(updatedType, updatedPoint) {
     try {
       const response = await this.#service.addPoint(updatedPoint);
-      const newPoint = this.#adaptToServer(response);
+      const newPoint = this.#adaptToClient(response);
 
       this.#points = [newPoint, ...this.#points];
       this._notify(updatedType, newPoint);
-    } catch (error) {
+    } catch (err) {
       throw new Error('Can\'t add point');
     }
   }
@@ -33,11 +33,12 @@ export default class PointsModel extends Observable {
     if (index === -1) {
       throw new Error('Can\'t delete unexisting point');
     }
+
     try {
       await this.#service.deletePoint(updatedPoint);
       this.#points = [...this.#points.slice(0, index), ...this.#points.slice(index + 1)];
       this._notify(updatedType);
-    } catch (error) {
+    } catch (err) {
       throw new Error('Can\'t delete point');
     }
   }
@@ -51,11 +52,11 @@ export default class PointsModel extends Observable {
 
     try {
       const response = await this.#service.updatePoint(updatedPoint);
-      const newPoint = this.#adaptToServer(response);
+      const newPoint = this.#adaptToClient(response);
 
       this.#points = [...this.#points.slice(0, index), newPoint, ...this.#points.slice(index + 1)];
       this._notify(updatedType, newPoint);
-    } catch (error) {
+    } catch (err) {
       throw new Error('Can\'t update point');
     }
   }
@@ -64,21 +65,21 @@ export default class PointsModel extends Observable {
     try {
       const points = await this.#service.points;
 
-      this.#points = points.map(this.#adaptToServer);
+      this.#points = points.map(this.#adaptToClient);
       this._notify(UpdateType.INIT, { isError: false });
-    } catch (error) {
+    } catch (err) {
       this.#points = [];
       this._notify(UpdateType.INIT, { isError: true });
     }
   }
 
-  #adaptToServer(point) {
+  #adaptToClient(point) {
     const adaptedPoint = {
       ...point,
       basePrice: point['base_price'],
       dateFrom: point['date_from'],
       dateTo: point['date_to'],
-      isFavorite: point['is_favorite']
+      isFavorite: point['is_favorite'],
     };
 
     delete adaptedPoint['base_price'];

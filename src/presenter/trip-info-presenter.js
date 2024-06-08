@@ -15,16 +15,12 @@ export default class TripInfoPresenter {
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
 
-    this.#pointsModel.addObserver(this.#handlePointsModelChange);
+    this.#pointsModel.addObserver(this.#handleModelChange);
   }
 
   init() {
     this.#renderTripInfo();
   }
-
-  #handlePointsModelChange = () => {
-    this.init();
-  };
 
   #renderTripInfo = () => {
     const previousComponent = this.#component;
@@ -41,5 +37,9 @@ export default class TripInfoPresenter {
 
     replace(this.#component, previousComponent);
     remove(previousComponent);
+  };
+
+  #handleModelChange = () => {
+    this.init();
   };
 }

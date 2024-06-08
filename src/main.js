@@ -1,37 +1,70 @@
-import { render, RenderPosition } from './framework/render';
-import Destination from './view/destination';
+import { render } from './framework/render';
+import TripPresenter from './presenter/trip-presenter';
+import TripInfoPresenter from './presenter/trip-info-presenter';
 import FilterPresenter from './presenter/filter-presenter';
-import RoutePresenter from './presenter/route-presenter';
-import MockService from './service/mock-service';
-import DestinationsModel from './model/destination-model';
+import DestinationModel from './model/destination-model';
 import OffersModel from './model/offers-model';
 import PointsModel from './model/points-model';
+import FilterModel from './model/filter-model';
+import NewEventButton from './view/new-event-button';
+import Destinations from './api-service/destinations';
+import Offers from './api-service/offers';
+import Points from './api-service/points';
+import { AUTHORIZATION, END_POINT } from './constants';
 
-const siteDestinationContainer = document.querySelector('.trip-main');
-const siteFilterContainer = document.querySelector('.trip-controls__filters');
-const siteSortContainer = document.querySelector('.trip-events');
+const headerInfoContainer = document.querySelector('.trip-main');
+const filterContainer = document.querySelector('.trip-controls__filters');
+const tripContainer = document.querySelector('.trip-events');
 
-const mockService = new MockService();
+const destinationsModel = new DestinationModel({ destinationsApiService: new Destinations(END_POINT, AUTHORIZATION) });
+const offersModel = new OffersModel({ offersApiService: new Offers(END_POINT, AUTHORIZATION) });
+const pointsModel = new PointsModel({ pointsApiService: new Points(END_POINT, AUTHORIZATION) });
+const filterModel = new FilterModel();
 
-const destinationsModel = new DestinationsModel(mockService);
-const offersModel = new OffersModel(mockService);
-const pointsModel = new PointsModel(mockService);
+const newPointButtonComponent = new NewEventButton({
+  onClick: handleNewPointButtonClick
+});
 
-const routePresenter = new RoutePresenter({
-  tripContainer: siteSortContainer,
+const tripInfoPresenter = new TripInfoPresenter({
+  container: headerInfoContainer,
+  pointsModel,
+  destinationsModel,
+  offersModel
+});
+
+const tripPresenter = new TripPresenter({
+  tripContainer,
+  pointsModel,
   destinationsModel,
   offersModel,
+  filterModel,
+  onNewPointDestroy: handleNewPointFormClose,
+  newPointButtonComponent
+});
+
+const filterPresenter = new FilterPresenter({
+  filterContainer,
+  filterModel,
   pointsModel
 });
 
-const filterPresenter = new FilterPresenter( { container: siteFilterContainer, pointsModel } );
+function handleNewPointFormClose() {
+  newPointButtonComponent.element.disabled = false;
+}
 
-render(new Destination(), siteDestinationContainer, RenderPosition.AFTERBEGIN);
+function handleNewPointButtonClick() {
+  tripPresenter.createPoint();
+  newPointButtonComponent.element.disabled = true;
+}
 
-routePresenter.init();
+async function initModels() {
+  await destinationsModel.init();
+  await offersModel.init();
+  await pointsModel.init();
+  render(newPointButtonComponent, headerInfoContainer);
+}
+
+tripInfoPresenter.init();
 filterPresenter.init();
-
-// 7.10. Меняй-удаляй: не успеваю до дедлайна, доделаю к защите
-// 8.6. Пришёл, увидел, загрузил (часть 1): не успеваю до дедлайна, доделаю к защите..
-// 8.7. Пришёл, увидел, загрузил (часть 2): не успеваю до дедлайна, доделаю к защите..
-// 8.8. Дополнительная функциональность: не успеваю до дедлайна, доделаю к защите..
+tripPresenter.init();
+initModels();

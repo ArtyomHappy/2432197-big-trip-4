@@ -1,39 +1,45 @@
 import { getDuration } from './point';
 import dayjs from 'dayjs';
 
-function getWeightForNullDate(dateA, dateB) {
-  if (dateA === null && dateB === null) { return 0; }
+function getWeightForNullDate(dateFirst, dateSecond) {
+  if (dateFirst === null && dateSecond === null) {
+    return 0;
+  }
 
-  if (dateA === null) { return 1; }
+  if (dateFirst === null) {
+    return 1;
+  }
 
-  if (dateB === null) { return -1; }
+  if (dateSecond === null) {
+    return -1;
+  }
 
   return null;
 }
 
-function sortPrice(pointA, pointB) {
-  const diff = pointA.basePrice - pointB.basePrice;
+function sortByPrice(pointFirst, pointSecond) {
+  const difference = pointFirst.basePrice - pointSecond.basePrice;
 
-  if (diff > 0) {
+  if (difference > 0) {
     return -1;
-  } else if (diff < 0) {
+  } else if (difference < 0) {
     return 1;
   } else {
     return 0;
   }
 }
 
-function sortTime(pointA, pointB) {
-  const weight = getWeightForNullDate(pointA.dateFrom, pointB.dateFrom);
-  const durationA = getDuration(pointA.dateFrom, pointA.dateTo);
-  const durationB = getDuration(pointB.dateFrom, pointB.dateTo);
+function sortByTime(pointFirtst, pointSecond) {
+  const weight = getWeightForNullDate(pointFirtst.dateFrom, pointSecond.dateFrom);
+  const durationFirst = getDuration(pointFirtst.dateFrom, pointFirtst.dateTo);
+  const durationSecond = getDuration(pointSecond.dateFrom, pointSecond.dateTo);
 
   if (weight !== null) {
     return weight;
   } else {
-    if (durationA.asMilliseconds() > durationB.asMilliseconds()) {
+    if (durationFirst.asMilliseconds() > durationSecond.asMilliseconds()) {
       return -1;
-    } else if (durationA.asMilliseconds() < durationB.asMilliseconds()) {
+    } else if (durationFirst.asMilliseconds() < durationSecond.asMilliseconds()) {
       return 1;
     } else {
       return 0;
@@ -41,10 +47,10 @@ function sortTime(pointA, pointB) {
   }
 }
 
-function sortDay(pointA, pointB) {
-  const weight = getWeightForNullDate(pointA.dateFrom, pointB.dateFrom);
+function sortByDay(pointFirst, pointSecond) {
+  const weight = getWeightForNullDate(pointFirst.dateFrom, pointSecond.dateFrom);
 
-  return weight ?? dayjs(pointA.dateFrom).diff(dayjs(pointB.dateFrom));
+  return weight ?? dayjs(pointFirst.dateFrom).diff(dayjs(pointSecond.dateFrom));
 }
 
-export { sortPrice, sortTime, sortDay };
+export { sortByPrice, sortByTime, sortByDay };

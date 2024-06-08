@@ -1,12 +1,20 @@
-import { AbstractView } from '../framework/view/abstract-view';
+import AbstractView from '../framework/view/abstract-view';
+import { EmptyListText } from '../constants';
 
-function createEmptyListTemplate () {
-  return `<section class="trip-events">
-  <h2 class="visually-hidden">Trip events</h2>
-  <p class="trip-events__msg">Click New Event to create your first point</p>
-</section>`;
+function createEmptyListTemplate(filterType) {
+  return `<p class="trip-events__msg">${EmptyListText[filterType]}</p>`;
 }
 
 export default class EmptyList extends AbstractView {
-  get template() { return createEmptyListTemplate(); }
+  #filterType = null;
+
+  constructor({ filterType }) {
+    super();
+
+    this.#filterType = filterType;
+  }
+
+  get template() {
+    return createEmptyListTemplate(this.#filterType);
+  }
 }

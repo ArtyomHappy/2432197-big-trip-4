@@ -1,17 +1,31 @@
-export default class OffersModel {
-  #service = null;
-  #offers = [];
+import Observable from '../framework/observable';
+import { UpdateType } from '../constants';
 
-  constructor(service) {
+export default class OffersModel extends Observable {
+  #offers = [];
+  #service = null;
+
+  constructor({ service }) {
+    super();
+
     this.#service = service;
-    this.#offers = this.service.getOffers();
   }
 
-  get() {
+  get offers() {
     return this.#offers;
   }
 
   getByType(type) {
-    return this.#offers.find((offer) => offer.type === type);
+    return this.offers.find((offer) => offer.type === type)?.offers;
+  }
+
+  async init() {
+    try {
+      const offers = await this.#service.offers;
+      this.#offers = offers;
+    } catch (error) {
+      this.#offers = [];
+      this._notify(UpdateType.INIT, { isError: true });
+    }
   }
 }

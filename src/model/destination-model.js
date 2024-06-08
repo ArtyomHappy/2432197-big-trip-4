@@ -1,17 +1,31 @@
-export default class DestinationsModel {
-  #service = null;
-  #destinations = [];
+import Observable from '../framework/observable';
+import { UpdateType } from '../constants';
 
-  constructor(service) {
+export default class DestinationModel extends Observable {
+  #destinations = [];
+  #service = null;
+
+  constructor({ service }) {
+    super();
+
     this.#service = service;
-    this.#destinations = this.service.getDestinations();
   }
 
-  get() {
+  get destinations() {
     return this.#destinations;
   }
 
   getById(id) {
-    return this.#destinations.find((destination) => destination.id === id);
+    return this.#destinations.find((destination) => (destination.id === id));
+  }
+
+  async init() {
+    try {
+      const destinations = await this.#service.destinations;
+      this.#destinations = destinations;
+    } catch (error) {
+      this.#destinations = [];
+      this._notify(UpdateType.INIT, { isError: true });
+    }
   }
 }

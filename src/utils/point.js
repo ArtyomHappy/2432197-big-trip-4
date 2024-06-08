@@ -1,91 +1,55 @@
-import { dayjs } from 'dayjs';
-import { duration } from 'dayjs/plugin/duration';
-import { relativeTime } from 'dayjs/plugin/relativeTime';
-import { getRandomNumber } from './general';
+import dayjs from 'dayjs';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import duration from 'dayjs/plugin/duration';
+import { TimePeriods } from '../constants';
 
-const TIME_PERIODS = {
-  MSEC_IN_SEC: 1000,
-  SEC_IN_MIN: 60,
-  MIN_IN_HOUR: 60,
-  HOUR_IN_DAY: 24,
-
-  get MSEC_IN_HOUR() {
-    return this.MSEC_IN_SEC * this.SEC_IN_MIN * this.MIN_IN_HOUR;
-  },
-
-  get MSEC_IN_DAY() {
-    return this.MSEC_IN_HOUR * this.HOUR_IN_DAY;
-  },
-};
-
+dayjs.extend(isSameOrBefore);
+dayjs.extend(isSameOrAfter);
 dayjs.extend(duration);
-dayjs.extend(relativeTime);
 
-let date = dayjs().subtract(getRandomNumber(0, 5), 'day').toDate();
-
-function humanizeDateTime(dateInfo) {
-  return dateInfo ? dayjs(dateInfo).format('YYYY-MM-DDTHH:mm') : '';
-}
-
-function humanizeShortDate(dateInfo) {
-  return dateInfo ? dayjs(dateInfo).format('MMM DD') : '';
-}
-
-function humanizeTime(dateInfo) {
-  return dateInfo ? dayjs(dateInfo).format('HH:mm') : '';
+function humanizeDateTime(dateInfo, format) {
+  return dateInfo ? dayjs(dateInfo).format(format) : '';
 }
 
 function getPointDuration(dateFrom, dateTo) {
-  const difference = dayjs(dateTo).diff(dayjs(dateFrom));
-  let pointDuration = 0;
+  const differenceInMinutes = dayjs(dateTo).diff(dayjs(dateFrom), 'minute');
 
-  switch(true) {
-    case(difference >= TIME_PERIODS.MSEC_IN_DAY):
-      pointDuration = dayjs.duration(difference).format('DD[D] HH[H] mm[M]');
-      break;
-    case(difference >= TIME_PERIODS.MSEC_IN_HOUR):
-      pointDuration = dayjs.duration(difference).format('HH[H] mm[M]');
-      break;
-    case(difference < TIME_PERIODS.MSEC_IN_HOUR):
-      pointDuration = dayjs.duration(difference).format('mm[M]');
-      break;
+  if (differenceInMinutes >= TimePeriods.MIN_IN_YEAR) {
+    return dayjs.duration(differenceInMinutes, 'minutes').format('YY[Y] DD[D] HH[H] mm[M]');
+  } else if (differenceInMinutes >= TimePeriods.MIN_IN_DAY) {
+    return dayjs.duration(differenceInMinutes, 'minutes').format('DD[D] HH[H] mm[M]');
+  } else if (differenceInMinutes >= TimePeriods.MIN_IN_HOUR) {
+    return dayjs.duration(differenceInMinutes, 'minutes').format('HH[H] mm[M]');
+  } else {
+    return dayjs.duration(differenceInMinutes, 'minutes').format('mm[M]');
   }
-
-  return pointDuration;
 }
 
-function getScheduleDate(dateInfo) {
-  return dayjs(dateInfo).format('DD/MM/YY HH:mm');
+function getDuration(dateFrom, dateTo) {
+  const differenceInMinutes = dayjs(dateTo).diff(dayjs(dateFrom), 'minute');
+
+  return dayjs.duration(differenceInMinutes);
 }
 
-function getDate({ next }) {
-  const minGap = getRandomNumber(0, 59);
-  const hourGap = getRandomNumber(1, 5);
-  const dayGap = getRandomNumber(0, 5);
-
-  if(next) {
-    date = dayjs(date).add(minGap, 'minute').add(hourGap, 'hour').add(dayGap, 'day').toDate();
-  }
-
-  return date;
+function areDatesEqual(dateFirst, dateSecond) {
+  return (dateFirst === null && dateSecond === null) || dayjs(dateFirst).isSame(dateSecond, 'D');
 }
 
-function isPointFuture(point) {
-  return dayjs().isBefore(point.dateFrom);
+function arePricesEqual(priceFirst, priceSecond) {
+  return priceFirst === priceSecond;
 }
 
-function isPointPresent(point) {
-  return (dayjs().isAfter(point.dateFrom) && dayjs().isBefore(point.dateTo));
+function isDateFuture(dateFrom) {
+  return dayjs(dateFrom).isAfter(dayjs());
 }
 
-function isPointPast(point) {
-  return dayjs().isAfter(point.dateTo);
+function isDatePresent(dateFrom, dateTo) {
+  return (dayjs().isSameOrAfter(dateFrom) && dayjs().isSameOrBefore(dateTo));
 }
 
-function getDuration(dateTo, dateFrom) {
-  const minuteDifference = dayjs(dateTo).diff(dayjs(dateFrom), 'minute');
-
-  return dayjs.duration(minuteDifference);
+function isDatePast(dateTo) {
+  return dayjs(dateTo).isBefore(dayjs());
 }
 
-export { humanizeDateTime, humanizeShortDate, humanizeTime, getPointDuration, getScheduleDate, getDate, isPointFuture, isPointPresent, isPointPast, getDuration };
+export { humanizeDateTime, getPointDuration, getDuration, areDatesEqual, arePricesEqual, isDateFuture, isDatePresent, isDatePast };

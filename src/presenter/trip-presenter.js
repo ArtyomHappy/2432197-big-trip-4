@@ -1,14 +1,14 @@
-import { RenderPosition, render, remove } from '../framework/render';
-import { sortByPrice, sortByTime, sortByDay } from '../utils/sort';
-import { filter } from '../utils/filter';
-import TripPointPresenter from './trip-point-presenter';
-import NewTripPointPresenter from './new-trip-point-presenter';
-import Sorting from '../view/sorting';
-import EmptyList from '../view/empty-list';
-import Loading from '../view/loading';
-import Error from '../view/error';
-import { TimeLimits, SortingType, FilterType, UpdateType, UserAction } from '../constants';
-import UiBlocker from '../framework/ui-blocker/ui-blocker';
+import { RenderPosition, render, remove } from '../framework/render.js';
+import { sortByPrice, sortByTime, sortByDay } from '../utils/sort.js';
+import { filter } from '../utils/filter.js';
+import TripPointPresenter from './trip-point-presenter.js';
+import NewTripPointPresenter from './new-trip-point-presenter.js';
+import Sorting from '../view/sorting.js';
+import EmptyList from '../view/empty-list.js';
+import Loading from '../view/loading.js';
+import Error from '../view/error.js';
+import { TimeLimits, SortingType, FilterType, UpdateType, UserAction } from '../constants.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 export default class TripPresenter {
   #container = null;
@@ -36,14 +36,14 @@ export default class TripPresenter {
     upperLimit: TimeLimits.UPPER_LIMIT
   });
 
-  constructor({ container, pointsModel, destinationsModel, offersModel, filterModel, onNewPointDestroy, newPointButton }) {
-    this.#container = container;
-    this.#pointsList = container.querySelector('.trip-events__list');
+  constructor({ tripContainer, pointsModel, destinationsModel, offersModel, filterModel, onNewPointDestroy, newPointButtonComponent }) {
+    this.#container = tripContainer;
+    this.#pointsList = tripContainer.querySelector('.trip-events__list');
     this.#pointsModel = pointsModel;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
     this.#filterModel = filterModel;
-    this.#newPointButton = newPointButton;
+    this.#newPointButton = newPointButtonComponent;
     this.#onNewPointDestroy = onNewPointDestroy;
 
     this.#newPointPresenter = new NewTripPointPresenter({

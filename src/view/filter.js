@@ -1,5 +1,5 @@
-import AbstractView from '../framework/view/abstract-view';
-import { raiseFirstChar } from '../utils/common';
+import AbstractView from '../framework/view/abstract-view.js';
+import { raiseFirstChar } from '../utils/common.js';
 
 function createFilterItemTemplate(filters, currentType) {
   return `<div class="trip-main__trip-controls  trip-controls">

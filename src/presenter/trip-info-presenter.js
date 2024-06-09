@@ -1,6 +1,6 @@
-import { RenderPosition, render, replace, remove } from '../framework/render';
-import TripInfo from '../view/trip-info';
-import { getTripInfo } from '../utils/trip-info';
+import { RenderPosition, render, replace, remove } from '../framework/render.js';
+import TripInfo from '../view/trip-info.js';
+import { getTripInfo } from '../utils/trip-info.js';
 
 export default class TripInfoPresenter {
   #container = null;

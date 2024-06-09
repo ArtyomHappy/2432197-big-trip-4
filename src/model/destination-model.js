@@ -1,14 +1,14 @@
-import Observable from '../framework/observable';
-import { UpdateType } from '../constants';
+import Observable from '../framework/observable.js';
+import { UpdateType } from '../constants.js';
 
 export default class DestinationModel extends Observable {
   #destinations = [];
   #service = null;
 
-  constructor({ service }) {
+  constructor({ destinationsApiService }) {
     super();
 
-    this.#service = service;
+    this.#service = destinationsApiService;
   }
 
   get destinations() {
@@ -22,6 +22,7 @@ export default class DestinationModel extends Observable {
   async init() {
     try {
       const destinations = await this.#service.destinations;
+
       this.#destinations = destinations;
     } catch (error) {
       this.#destinations = [];

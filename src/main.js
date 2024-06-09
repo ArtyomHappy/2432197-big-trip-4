@@ -10,15 +10,15 @@ import NewEventButton from './view/new-event-button';
 import Destinations from './api-service/destinations';
 import Offers from './api-service/offers';
 import Points from './api-service/points';
-import { AUTHORIZATION, END_POINT } from './constants';
+import { AUTHORIZATION, ADDRESS } from './constants';
 
 const headerInfoContainer = document.querySelector('.trip-main');
 const filterContainer = document.querySelector('.trip-controls__filters');
 const tripContainer = document.querySelector('.trip-events');
 
-const destinationsModel = new DestinationModel({ destinationsApiService: new Destinations(END_POINT, AUTHORIZATION) });
-const offersModel = new OffersModel({ offersApiService: new Offers(END_POINT, AUTHORIZATION) });
-const pointsModel = new PointsModel({ pointsApiService: new Points(END_POINT, AUTHORIZATION) });
+const destinationsModel = new DestinationModel({ destinationsApiService: new Destinations(ADDRESS, AUTHORIZATION) });
+const offersModel = new OffersModel({ offersApiService: new Offers(ADDRESS, AUTHORIZATION) });
+const pointsModel = new PointsModel({ pointsApiService: new Points(ADDRESS, AUTHORIZATION) });
 const filterModel = new FilterModel();
 
 const newPointButtonComponent = new NewEventButton({

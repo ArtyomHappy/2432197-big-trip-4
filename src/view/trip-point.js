@@ -3,9 +3,9 @@ import { humanizeDateTime, getPointDuration } from '../utils/point';
 import { raiseFirstChar } from '../utils/common';
 import he from 'he';
 
-function createPointOffersTemplate({ currentOffers, selectedOffers }) {
+function createOffersTemplate({ currentOffers, offers }) {
   return `<ul class="event__selected-offers">
-  ${currentOffers.filter((offer) => selectedOffers.includes(offer.id)).map((offer) => `
+  ${currentOffers.filter((offer) => offers.includes(offer.id)).map((offer) => `
       <li class="event__offer">
         <span class="event__offer-title">${offer.title}</span>
         &plus;&euro;&nbsp;
@@ -15,7 +15,7 @@ function createPointOffersTemplate({ currentOffers, selectedOffers }) {
   </ul>`;
 }
 
-function createTripPointTemplate({ point, pointDestination, pointOffers }) {
+function createTripPointTemplate({ point, destination, currentOffers }) {
   const { basePrice, dateFrom, dateTo, isFavorite, type, offers } = point;
   const favoriteClassName = isFavorite ? 'event__favorite-btn--active' : '';
 
@@ -24,7 +24,7 @@ function createTripPointTemplate({ point, pointDestination, pointOffers }) {
   <div class="event__type">
     <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
   </div>
-  <h3 class="event__title">${raiseFirstChar(type)} ${he.encode(pointDestination.name)}</h3>
+  <h3 class="event__title">${raiseFirstChar(type)} ${he.encode(destination.name)}</h3>
   <div class="event__schedule">
     <p class="event__time">
       <time class="event__start-time" datetime="${humanizeDateTime(dateFrom, 'YYYY-MM-DDTHH:mm')}">${humanizeDateTime(dateFrom, 'HH:mm')}</time>
@@ -37,7 +37,7 @@ function createTripPointTemplate({ point, pointDestination, pointOffers }) {
     &euro;&nbsp;<span class="event__price-value">${he.encode(basePrice.toString())}</span>
   </p>
   <h4 class="visually-hidden">Offers:</h4>
-    ${offers.length > 0 ? createPointOffersTemplate({ pointOffers, offers }) : ''}
+    ${offers.length > 0 ? createOffersTemplate({ currentOffers, offers }) : ''}
   <button class="event__favorite-btn ${favoriteClassName}" type="button">
     <span class="visually-hidden">Add to favorite</span>
     <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -74,13 +74,13 @@ export default class TripPoint extends AbstractView {
     return createTripPointTemplate({ point: this.#point, destination: this.#destination, currentOffers: this.#offers });
   }
 
-  #editClickHandler = (evt) => {
-    evt.preventDefault();
-    this.#onEditClick();
-  };
-
   #favoriteClickHandler = (evt) => {
     evt.preventDefault();
     this.#onFavoriteClick();
+  };
+
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#onEditClick();
   };
 }

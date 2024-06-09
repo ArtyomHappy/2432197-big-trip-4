@@ -10,8 +10,8 @@ export default class NewTripPointPresenter {
   #onDataChange = null;
   #onDestroy = null;
 
-  constructor({ container, onDataChange, onDestroy, offersModel, destinationsModel }) {
-    this.#container = container;
+  constructor({ pointListContainer, onDataChange, onDestroy, offersModel, destinationsModel }) {
+    this.#container = pointListContainer;
     this.#onDataChange = onDataChange;
     this.#onDestroy = onDestroy;
     this.#destinationsModel = destinationsModel;

@@ -1,7 +1,7 @@
-import { render, replace, remove } from '../framework/render';
-import Filter from '../view/filter';
+import { render, replace, remove } from '../framework/render.js';
+import Filter from '../view/filter.js';
 import { filter } from '../utils/filter.js';
-import { FilterType, UpdateType } from '../constants';
+import { FilterType, UpdateType } from '../constants.js';
 
 export default class FilterPresenter {
   #container = null;
@@ -9,8 +9,8 @@ export default class FilterPresenter {
   #pointsModel = null;
   #component = null;
 
-  constructor({ container, filterModel, pointsModel }) {
-    this.#container = container;
+  constructor({ filterContainer, filterModel, pointsModel }) {
+    this.#container = filterContainer;
     this.#filterModel = filterModel;
     this.#pointsModel = pointsModel;
 

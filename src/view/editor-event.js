@@ -1,7 +1,7 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { humanizeDateTime } from '../utils/point';
 import { getLastWord, raiseFirstChar } from '../utils/common';
-import FlatPicker from './flatpicker.js';
+import FlatPicker from './date-selection.js';
 import { POINT_TYPES, EmptyPoint, EditingType } from '../constants';
 import dayjs from 'dayjs';
 import he from 'he';
@@ -137,14 +137,14 @@ export default class EditorEvent extends AbstractStatefulView {
   #datePickerFrom = null;
   #datePickerTo = null;
 
-  constructor({ type = EditingType.UPDATE, point = EmptyPoint, destinations, offers, onEditorSubmit, onEditorReset, onDeleteClick }) {
+  constructor({ point = EmptyPoint, onFormSubmit, onFormReset, destinations, offers, onDeleteClick, type = EditingType.UPDATE }) {
     super();
 
     this.#type = type;
     this.#destinations = destinations;
     this.#offers = offers;
-    this.#handleEditorSubmit = onEditorSubmit;
-    this.#handleEditorReset = onEditorReset;
+    this.#handleEditorSubmit = onFormSubmit;
+    this.#handleEditorReset = onFormReset;
     this.#handleDeleteClick = onDeleteClick;
 
     this._setState(EditorEvent.parsePointToState(point));
@@ -154,9 +154,9 @@ export default class EditorEvent extends AbstractStatefulView {
   get template() {
     return createEditorPointTemplate({
       point: this._state,
-      destinations: this.#destinations,
+      selectedDestinations: this.#destinations,
       selectedOffers: this.#offers,
-      typeForm: this.#type
+      editingType: this.#type
     });
   }
 

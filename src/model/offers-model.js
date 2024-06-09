@@ -1,14 +1,14 @@
-import Observable from '../framework/observable';
-import { UpdateType } from '../constants';
+import Observable from '../framework/observable.js';
+import { UpdateType } from '../constants.js';
 
 export default class OffersModel extends Observable {
   #offers = [];
   #service = null;
 
-  constructor({ service }) {
+  constructor({ offersApiService }) {
     super();
 
-    this.#service = service;
+    this.#service = offersApiService;
   }
 
   get offers() {
@@ -22,6 +22,7 @@ export default class OffersModel extends Observable {
   async init() {
     try {
       const offers = await this.#service.offers;
+
       this.#offers = offers;
     } catch (error) {
       this.#offers = [];

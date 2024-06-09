@@ -1,14 +1,14 @@
-import Observable from '../framework/observable';
-import { UpdateType } from '../constants';
+import Observable from '../framework/observable.js';
+import { UpdateType } from '../constants.js';
 
 export default class PointsModel extends Observable {
   #points = [];
   #service = null;
 
-  constructor({ service }) {
+  constructor({ pointsApiService }) {
     super();
 
-    this.#service = service;
+    this.#service = pointsApiService;
   }
 
   get points() {
@@ -22,7 +22,7 @@ export default class PointsModel extends Observable {
 
       this.#points = [newPoint, ...this.#points];
       this._notify(updatedType, newPoint);
-    } catch (err) {
+    } catch (error) {
       throw new Error('Can\'t add point');
     }
   }
@@ -38,7 +38,7 @@ export default class PointsModel extends Observable {
       await this.#service.deletePoint(updatedPoint);
       this.#points = [...this.#points.slice(0, index), ...this.#points.slice(index + 1)];
       this._notify(updatedType);
-    } catch (err) {
+    } catch (error) {
       throw new Error('Can\'t delete point');
     }
   }
@@ -56,7 +56,7 @@ export default class PointsModel extends Observable {
 
       this.#points = [...this.#points.slice(0, index), newPoint, ...this.#points.slice(index + 1)];
       this._notify(updatedType, newPoint);
-    } catch (err) {
+    } catch (error) {
       throw new Error('Can\'t update point');
     }
   }
@@ -67,7 +67,7 @@ export default class PointsModel extends Observable {
 
       this.#points = points.map(this.#adaptToClient);
       this._notify(UpdateType.INIT, { isError: false });
-    } catch (err) {
+    } catch (error) {
       this.#points = [];
       this._notify(UpdateType.INIT, { isError: true });
     }

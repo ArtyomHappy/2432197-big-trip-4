@@ -1,5 +1,5 @@
-import AbstractView from '../framework/view/abstract-view';
-import { EmptyListText } from '../constants';
+import AbstractView from '../framework/view/abstract-view.js';
+import { EmptyListText } from '../constants.js';
 
 function createEmptyListTemplate(filterType) {
   return `<p class="trip-events__msg">${EmptyListText[filterType]}</p>`;

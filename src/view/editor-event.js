@@ -131,11 +131,11 @@ export default class EditorEvent extends AbstractStatefulView {
   #type = null;
   #destinations = null;
   #offers = null;
-  #handleEditorSubmit = null;
-  #handleEditorReset = null;
-  #handleDeleteClick = null;
-  #datePickerFrom = null;
-  #datePickerTo = null;
+  #onEditorSubmit = null;
+  #onEditorReset = null;
+  #onDeleteClick = null;
+  #dateSelectorFrom = null;
+  #dateSelectorTo = null;
 
   constructor({ point = EmptyPoint, onFormSubmit, onFormReset, destinations, offers, onDeleteClick, type = EditingType.UPDATE }) {
     super();
@@ -143,9 +143,9 @@ export default class EditorEvent extends AbstractStatefulView {
     this.#type = type;
     this.#destinations = destinations;
     this.#offers = offers;
-    this.#handleEditorSubmit = onFormSubmit;
-    this.#handleEditorReset = onFormReset;
-    this.#handleDeleteClick = onDeleteClick;
+    this.#onEditorSubmit = onFormSubmit;
+    this.#onEditorReset = onFormReset;
+    this.#onDeleteClick = onDeleteClick;
 
     this._setState(EditorEvent.parsePointToState(point));
     this._restoreHandlers();
@@ -168,7 +168,7 @@ export default class EditorEvent extends AbstractStatefulView {
     this.element.querySelector('.event__input--price').addEventListener('change', this.#priceChangeHandler);
     this.element.querySelector('.event__available-offers')?.addEventListener('change', this.#offersChangeHandler);
     this.element.querySelector('.event__reset-btn').addEventListener('click', this.#deleteClickHandler);
-    this.#setDatePickers();
+    this.#setDateSelectors();
   }
 
   reset = (point) => {
@@ -178,14 +178,14 @@ export default class EditorEvent extends AbstractStatefulView {
   removeElement = () => {
     super.removeElement();
 
-    if (this.#datePickerFrom) {
-      this.#datePickerFrom.destroy();
-      this.#datePickerFrom = null;
+    if (this.#dateSelectorFrom) {
+      this.#dateSelectorFrom.destroy();
+      this.#dateSelectorFrom = null;
     }
 
-    if (this.#datePickerTo) {
-      this.#datePickerTo.destroy();
-      this.#datePickerTo = null;
+    if (this.#dateSelectorTo) {
+      this.#dateSelectorTo.destroy();
+      this.#dateSelectorTo = null;
     }
   };
 
@@ -206,47 +206,42 @@ export default class EditorEvent extends AbstractStatefulView {
     return point;
   };
 
-  #setDatePickers = () => {
-    this.#datePickerFrom = new FlatPicker({
+  #setDateSelectors = () => {
+    this.#dateSelectorFrom = new FlatPicker({
       element: this.element.querySelector('#event-start-time-1'),
       defaultDate: this._state.dateFrom,
       maxDate: this._state.dateTo,
-      onClose: this.#dateFromCloseHandler,
+      onClose: this.#onCloseDateSelectorFromHandler,
     });
 
-    this.#datePickerTo = new FlatPicker({
+    this.#dateSelectorTo = new FlatPicker({
       element: this.element.querySelector('#event-end-time-1'),
       defaultDate: this._state.dateTo,
       minDate: this._state.dateFrom,
-      onClose: this.#dateToCloseHandler,
+      onClose: this.#onCloseDateSelectorToHandler,
     });
   };
 
-  #dateFromCloseHandler = ([userDate]) => {
+  #onCloseDateSelectorFromHandler = ([userDate]) => {
     this._setState({ dateFrom: userDate });
 
-    this.#datePickerTo.setMinDate(this._state.dateFrom);
+    this.#dateSelectorTo.setMinDate(this._state.dateFrom);
   };
 
-  #dateToCloseHandler = ([userDate]) => {
+  #onCloseDateSelectorToHandler = ([userDate]) => {
     this._setState({ dateTo: userDate });
 
-    this.#datePickerFrom.setMaxDate(this._state.dateTo);
+    this.#dateSelectorFrom.setMaxDate(this._state.dateTo);
   };
 
   #editorSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleEditorSubmit(EditorEvent.parseStateToPoint(this._state));
+    this.#onEditorSubmit(EditorEvent.parseStateToPoint(this._state));
   };
 
   #editorResetHandler = (evt) => {
     evt.preventDefault();
-    this.#handleEditorReset();
-  };
-
-  #deleteClickHandler = (evt) => {
-    evt.preventDefault();
-    this.#handleDeleteClick(EditorEvent.parseStateToPoint(this._state));
+    this.#onEditorReset();
   };
 
   #typeChangeHandler = (evt) => {
@@ -259,6 +254,10 @@ export default class EditorEvent extends AbstractStatefulView {
     this.updateElement({ destination: selectedDestination });
   };
 
+  #priceChangeHandler = (evt) => {
+    this._setState({ basePrice: evt.target.value });
+  };
+
   #offersChangeHandler = () => {
     const selectedOffers = Array.from(this.element.querySelectorAll('.event__offer-checkbox:checked'))
       .map(({ id }) => id.split('-').slice(3).join('-'));
@@ -266,7 +265,8 @@ export default class EditorEvent extends AbstractStatefulView {
     this._setState({ offers: selectedOffers });
   };
 
-  #priceChangeHandler = (evt) => {
-    this._setState({ basePrice: evt.target.value });
+  #deleteClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#onDeleteClick(EditorEvent.parseStateToPoint(this._state));
   };
 }

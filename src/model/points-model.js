@@ -5,10 +5,10 @@ export default class PointsModel extends Observable {
   #points = [];
   #service = null;
 
-  constructor({ pointsApiService }) {
+  constructor({ service }) {
     super();
 
-    this.#service = pointsApiService;
+    this.#service = service;
   }
 
   get points() {
@@ -18,12 +18,30 @@ export default class PointsModel extends Observable {
   async addPoint(updatedType, updatedPoint) {
     try {
       const response = await this.#service.addPoint(updatedPoint);
-      const newPoint = this.#adaptToClient(response);
+      const newPoint = this.#adaptPointToServer(response);
 
       this.#points = [newPoint, ...this.#points];
       this._notify(updatedType, newPoint);
     } catch (error) {
       throw new Error('Can\'t add point');
+    }
+  }
+
+  async updatePoint(updatedType, updatedPoint) {
+    const index = this.#points.findIndex((point) => point.id === updatedPoint.id);
+
+    if (index === -1) {
+      throw new Error('Can\'t update unexisting point');
+    }
+
+    try {
+      const response = await this.#service.updatePoint(updatedPoint);
+      const newPoint = this.#adaptPointToServer(response);
+
+      this.#points = [...this.#points.slice(0, index), newPoint, ...this.#points.slice(index + 1)];
+      this._notify(updatedType, newPoint);
+    } catch (error) {
+      throw new Error('Can\'t update point');
     }
   }
 
@@ -43,29 +61,11 @@ export default class PointsModel extends Observable {
     }
   }
 
-  async updatePoint(updatedType, updatedPoint) {
-    const index = this.#points.findIndex((point) => point.id === updatedPoint.id);
-
-    if (index === -1) {
-      throw new Error('Can\'t update unexisting point');
-    }
-
-    try {
-      const response = await this.#service.updatePoint(updatedPoint);
-      const newPoint = this.#adaptToClient(response);
-
-      this.#points = [...this.#points.slice(0, index), newPoint, ...this.#points.slice(index + 1)];
-      this._notify(updatedType, newPoint);
-    } catch (error) {
-      throw new Error('Can\'t update point');
-    }
-  }
-
   async init() {
     try {
       const points = await this.#service.points;
 
-      this.#points = points.map(this.#adaptToClient);
+      this.#points = points.map(this.#adaptPointToServer);
       this._notify(UpdateType.INIT, { isError: false });
     } catch (error) {
       this.#points = [];
@@ -73,7 +73,7 @@ export default class PointsModel extends Observable {
     }
   }
 
-  #adaptToClient(point) {
+  #adaptPointToServer(point) {
     const adaptedPoint = {
       ...point,
       basePrice: point['base_price'],

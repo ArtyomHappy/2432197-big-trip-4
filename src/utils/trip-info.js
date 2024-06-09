@@ -1,25 +1,25 @@
 import dayjs from 'dayjs';
 import { sortByDay } from './sort';
 
-function createTripView(destinations) {
-  let pathView = '';
+function createDestinations(destinations) {
+  let trip = '';
 
   if (destinations.length < 4) {
     destinations.forEach((destination, index) => {
       if (index !== destinations.length - 1) {
-        pathView += `${destination} &mdash; `;
+        trip += `${destination} &mdash; `;
       } else {
-        pathView += `${destination}`;
+        trip += `${destination}`;
       }
     });
   } else {
-    pathView = `${destinations[0]} &mdash; ... &mdash; ${destinations[destinations.length - 1]}`;
+    trip = `${destinations[0]} &mdash; ... &mdash; ${destinations[destinations.length - 1]}`;
   }
 
-  return pathView;
+  return trip;
 }
 
-function createDatesView(dateFirst, dateSecond) {
+function createDates(dateFirst, dateSecond) {
   return dateFirst && dateSecond ? `${dayjs(dateFirst).format('D MMM').toUpperCase()}&nbsp;&mdash;&nbsp;${dayjs(dateSecond).format('D MMM').toUpperCase()}` : '';
 }
 
@@ -49,8 +49,8 @@ function getTripInfo({ points, destinations, offers }) {
   });
 
   return {
-    destinationsString: createTripView(trip),
-    datesString: createDatesView(sortedPoints[0]?.dateFrom, sortedPoints[sortedPoints.length - 1]?.dateTo),
+    destinationsString: createDestinations(trip),
+    datesString: createDates(sortedPoints[0]?.dateFrom, sortedPoints[sortedPoints.length - 1]?.dateTo),
     total: totalTrips
   };
 }

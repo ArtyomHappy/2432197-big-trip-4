@@ -15,24 +15,13 @@ export default class TripPointPresenter {
   #onModeChange = null;
   #mode = Mode.DEFAULT;
 
-  constructor({ pointsListContainer, onDataChange, onModeChange, destinationsModel, offersModel }) {
-    this.#container = pointsListContainer;
-    this.#onDataChange = onDataChange;
-    this.#onModeChange = onModeChange;
+  constructor({ container, destinationsModel, offersModel, onDataChange, onModeChange }) {
+    this.#container = container;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
+    this.#onDataChange = onDataChange;
+    this.#onModeChange = onModeChange;
   }
-
-  destroy() {
-    remove(this.#pointComponent);
-    remove(this.#editorComponent);
-  }
-
-  resetMode = () => {
-    if (this.#mode !== Mode.DEFAULT) {
-      this.#replaceFormToCard();
-    }
-  };
 
   init(point) {
     this.#point = point;
@@ -44,17 +33,17 @@ export default class TripPointPresenter {
       point: this.#point,
       destination: this.#destinationsModel.getById(point.destination),
       offers: this.#offersModel.getByType(point.type),
-      onEditClick: this.#handleEditClick,
-      onFavoriteClick: this.#handleFavoriteClick,
+      onEditClick: this.#onEditClick,
+      onFavoriteClick: this.#onFavoriteClick,
     });
 
     this.#editorComponent = new EditorEvent({
       point: this.#point,
       destinations: this.#destinationsModel.destinations,
       offers: this.#offersModel.offers,
-      onFormReset: this.#handleFormReset,
-      onFormSubmit: this.#handleFormSubmit,
-      onDeleteClick: this.#handleDeleteClick
+      onFormReset: this.#onFormReset,
+      onFormSubmit: this.#onFormSubmit,
+      onDeleteClick: this.#onDeleteClick
     });
 
     if (!previousPointComponent || !previousEditorComponent) {
@@ -75,7 +64,7 @@ export default class TripPointPresenter {
     remove(previousEditorComponent);
   }
 
-  setAborting() {
+  setCanceling() {
     if (this.#mode === Mode.DEFAULT) {
       this.#pointComponent.shake();
       return;
@@ -92,15 +81,6 @@ export default class TripPointPresenter {
     this.#editorComponent.shake(resetState);
   }
 
-  setDeleting() {
-    if (this.#mode === Mode.EDITING) {
-      this.#editorComponent.updateElement({
-        isDisabled: true,
-        isDeleting: true,
-      });
-    }
-  }
-
   setSaving() {
     if (this.#mode === Mode.EDITING) {
       this.#editorComponent.updateElement({
@@ -110,34 +90,46 @@ export default class TripPointPresenter {
     }
   }
 
-  #replaceCardToForm() {
+  setDeleting() {
+    if (this.#mode === Mode.EDITING) {
+      this.#editorComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
+  }
+
+  destroy() {
+    remove(this.#pointComponent);
+    remove(this.#editorComponent);
+  }
+
+  resetMode = () => {
+    if (this.#mode !== Mode.DEFAULT) {
+      this.#switchToCard();
+    }
+  };
+
+  #switchToForm() {
     replace(this.#editorComponent, this.#pointComponent);
-    document.addEventListener('keydown', this.#escKeyDownHandler);
+    document.addEventListener('keydown', this.#onEscape);
 
     this.#onModeChange();
     this.#mode = Mode.EDITING;
   }
 
-  #replaceFormToCard() {
+  #switchToCard() {
     replace(this.#pointComponent, this.#editorComponent);
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
+    document.removeEventListener('keydown', this.#onEscape);
 
     this.#mode = Mode.DEFAULT;
   }
 
-  #escKeyDownHandler = (evt) => {
-    if (evt.key === 'Escape') {
-      evt.preventDefault();
-      this.#editorComponent.reset(this.#point);
-      this.#replaceFormToCard();
-    }
+  #onEditClick = () => {
+    this.#switchToForm();
   };
 
-  #handleEditClick = () => {
-    this.#replaceCardToForm();
-  };
-
-  #handleFavoriteClick = () => {
+  #onFavoriteClick = () => {
     this.#onDataChange(
       UserAction.UPDATE_POINT,
       UpdateType.MINOR,
@@ -145,7 +137,12 @@ export default class TripPointPresenter {
     );
   };
 
-  #handleFormSubmit = (update) => {
+  #onFormReset = () => {
+    this.#editorComponent.reset(this.#point);
+    this.#switchToCard();
+  };
+
+  #onFormSubmit = (update) => {
     const isMinorUpdate =
       !areDatesEqual(this.#point.dateFrom, update.dateFrom) ||
       !areDatesEqual(this.#point.dateTo, update.dateTo) ||
@@ -158,16 +155,19 @@ export default class TripPointPresenter {
     );
   };
 
-  #handleFormReset = () => {
-    this.#editorComponent.reset(this.#point);
-    this.#replaceFormToCard();
-  };
-
-  #handleDeleteClick = (point) => {
+  #onDeleteClick = (point) => {
     this.#onDataChange(
       UserAction.DELETE_POINT,
       UpdateType.MINOR,
       point,
     );
+  };
+
+  #onEscape = (evt) => {
+    if (evt.key === 'Escape') {
+      evt.preventDefault();
+      this.#editorComponent.reset(this.#point);
+      this.#switchToCard();
+    }
   };
 }

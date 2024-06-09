@@ -10,23 +10,12 @@ export default class NewTripPointPresenter {
   #onDataChange = null;
   #onDestroy = null;
 
-  constructor({ pointListContainer, onDataChange, onDestroy, offersModel, destinationsModel }) {
-    this.#container = pointListContainer;
-    this.#onDataChange = onDataChange;
-    this.#onDestroy = onDestroy;
+  constructor({ container, destinationsModel, offersModel, onDataChange, onDestroy }) {
+    this.#container = container;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
-  }
-
-  destroy({ isCanceled = true } = {}) {
-    if (!this.#editorComponent) {
-      return;
-    }
-
-    remove(this.#editorComponent);
-    this.#editorComponent = null;
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
-    this.#onDestroy({ isCanceled });
+    this.#onDataChange = onDataChange;
+    this.#onDestroy = onDestroy;
   }
 
   init() {
@@ -37,16 +26,16 @@ export default class NewTripPointPresenter {
     this.#editorComponent = new EditorEvent({
       destinations: this.#destinationsModel.destinations,
       offers: this.#offersModel.offers,
-      onFormSubmit: this.#handleFormSubmit,
-      onDeleteClick: this.#handleDeleteClick,
+      onFormSubmit: this.#onFormSubmit,
+      onDeleteClick: this.#onDeleteClick,
       type: EditingType.NEW
     });
 
     render(this.#editorComponent, this.#container, RenderPosition.AFTERBEGIN);
-    document.addEventListener('keydown', this.#escKeyDownHandler);
+    document.addEventListener('keydown', this.#onEscape);
   }
 
-  setAborting() {
+  setCanceling() {
     const resetState = () => {
       this.#editorComponent.updateElement({
         isDisabled: false,
@@ -65,7 +54,18 @@ export default class NewTripPointPresenter {
     });
   }
 
-  #handleFormSubmit = (point) => {
+  destroy({ isCanceled = true } = {}) {
+    if (!this.#editorComponent) {
+      return;
+    }
+
+    remove(this.#editorComponent);
+    this.#editorComponent = null;
+    document.removeEventListener('keydown', this.#onEscape);
+    this.#onDestroy({ isCanceled });
+  }
+
+  #onFormSubmit = (point) => {
     this.#onDataChange(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
@@ -73,9 +73,9 @@ export default class NewTripPointPresenter {
     );
   };
 
-  #handleDeleteClick = () => { this.destroy(); };
+  #onDeleteClick = () => { this.destroy(); };
 
-  #escKeyDownHandler = (evt) => {
+  #onEscape = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
       this.destroy();

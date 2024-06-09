@@ -12,24 +12,17 @@ import Offers from './api-service/offers';
 import Points from './api-service/points';
 import { AUTHORIZATION, ADDRESS } from './constants';
 
-const headerInfoContainer = document.querySelector('.trip-main');
-const filterContainer = document.querySelector('.trip-controls__filters');
+const mainHeaderContainer = document.querySelector('.trip-main');
 const tripContainer = document.querySelector('.trip-events');
+const filterContainer = document.querySelector('.trip-controls__filters');
 
-const destinationsModel = new DestinationModel({ destinationsApiService: new Destinations(ADDRESS, AUTHORIZATION) });
-const offersModel = new OffersModel({ offersApiService: new Offers(ADDRESS, AUTHORIZATION) });
-const pointsModel = new PointsModel({ pointsApiService: new Points(ADDRESS, AUTHORIZATION) });
+const pointsModel = new PointsModel({ service: new Points(ADDRESS, AUTHORIZATION) });
+const destinationsModel = new DestinationModel({ service: new Destinations(ADDRESS, AUTHORIZATION) });
+const offersModel = new OffersModel({ service: new Offers(ADDRESS, AUTHORIZATION) });
 const filterModel = new FilterModel();
 
-const newPointButtonComponent = new NewEventButton({
-  onClick: handleNewPointButtonClick
-});
-
-const tripInfoPresenter = new TripInfoPresenter({
-  container: headerInfoContainer,
-  pointsModel,
-  destinationsModel,
-  offersModel
+const newEventButtonComponent = new NewEventButton({
+  onClick: onClickNewEventButton
 });
 
 const tripPresenter = new TripPresenter({
@@ -38,8 +31,15 @@ const tripPresenter = new TripPresenter({
   destinationsModel,
   offersModel,
   filterModel,
-  onNewPointDestroy: handleNewPointFormClose,
-  newPointButtonComponent
+  onNewPointDestroy: onNewPointDestroy,
+  newEventButtonComponent
+});
+
+const tripInfoPresenter = new TripInfoPresenter({
+  container: mainHeaderContainer,
+  pointsModel,
+  destinationsModel,
+  offersModel
 });
 
 const filterPresenter = new FilterPresenter({
@@ -48,20 +48,20 @@ const filterPresenter = new FilterPresenter({
   pointsModel
 });
 
-function handleNewPointFormClose() {
-  newPointButtonComponent.element.disabled = false;
+function onClickNewEventButton() {
+  tripPresenter.createPoint();
+  newEventButtonComponent.element.disabled = true;
 }
 
-function handleNewPointButtonClick() {
-  tripPresenter.createPoint();
-  newPointButtonComponent.element.disabled = true;
+function onNewPointDestroy() {
+  newEventButtonComponent.element.disabled = false;
 }
 
 async function initModels() {
   await destinationsModel.init();
   await offersModel.init();
   await pointsModel.init();
-  render(newPointButtonComponent, headerInfoContainer);
+  render(newEventButtonComponent, mainHeaderContainer);
 }
 
 tripInfoPresenter.init();

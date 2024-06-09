@@ -1,5 +1,6 @@
-const AUTHORIZATION = 'Basic authorization';
 const ADDRESS = 'https://21.objects.htmlacademy.pro/big-trip';
+
+const AUTHORIZATION = 'Basic authorization';
 
 const POINT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
@@ -74,4 +75,4 @@ const EmptyListText = {
   [FilterType.PRESENT]: 'There are no present events now'
 };
 
-export { AUTHORIZATION, ADDRESS, POINT_TYPES, TimePeriods, TimeLimits, EmptyPoint, SortingType, FilterType, UpdateType, EditingType, UserAction, Mode, Method, EmptyListText };
+export { ADDRESS, AUTHORIZATION, POINT_TYPES, TimePeriods, TimeLimits, EmptyPoint, SortingType, FilterType, UpdateType, EditingType, UserAction, Mode, Method, EmptyListText };

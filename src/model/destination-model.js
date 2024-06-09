@@ -5,10 +5,10 @@ export default class DestinationModel extends Observable {
   #destinations = [];
   #service = null;
 
-  constructor({ destinationsApiService }) {
+  constructor({ service }) {
     super();
 
-    this.#service = destinationsApiService;
+    this.#service = service;
   }
 
   get destinations() {

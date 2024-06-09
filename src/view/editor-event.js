@@ -2,7 +2,7 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { humanizeDateTime } from '../utils/point';
 import { getLastWord, raiseFirstChar } from '../utils/common';
 import FlatPicker from './flatpicker.js';
-import { POINT_TYPES, EMPTY_POINT, EditingType } from '../constants';
+import { POINT_TYPES, EmptyPoint, EditingType } from '../constants';
 import dayjs from 'dayjs';
 import he from 'he';
 
@@ -137,7 +137,7 @@ export default class EditorEvent extends AbstractStatefulView {
   #datePickerFrom = null;
   #datePickerTo = null;
 
-  constructor({ type = EditingType.UPDATE, point = EMPTY_POINT, destinations, offers, onEditorSubmit, onEditorReset, onDeleteClick }) {
+  constructor({ type = EditingType.UPDATE, point = EmptyPoint, destinations, offers, onEditorSubmit, onEditorReset, onDeleteClick }) {
     super();
 
     this.#type = type;

@@ -1,6 +1,6 @@
 import AbstractView from '../framework/view/abstract-view';
 import { humanizeDateTime, getPointDuration } from '../utils/point';
-import { raiseFirstChar } from '../utils/commom;';
+import { raiseFirstChar } from '../utils/common';
 import he from 'he';
 
 function createPointOffersTemplate({ currentOffers, selectedOffers }) {

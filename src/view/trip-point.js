@@ -1,7 +1,7 @@
-import AbstractView from '../framework/view/abstract-view';
-import { humanizeDateTime, getPointDuration } from '../utils/point';
-import { raiseFirstChar } from '../utils/common';
 import he from 'he';
+import AbstractView from '../framework/view/abstract-view.js';
+import { raiseFirstChar } from '../utils/common.js';
+import { humanizeDateTime, getPointDuration } from '../utils/point.js';
 
 function createOffersTemplate({ currentOffers, offers }) {
   return `<ul class="event__selected-offers">

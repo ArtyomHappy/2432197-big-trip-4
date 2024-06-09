@@ -1,5 +1,5 @@
-import { getDuration } from './point';
 import dayjs from 'dayjs';
+import { getDuration } from './point.js';
 
 function getWeightForNullDate(dateFirst, dateSecond) {
   if (dateFirst === null && dateSecond === null) {

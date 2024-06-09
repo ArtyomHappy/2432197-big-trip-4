@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { sortByDay } from './sort';
+import { sortByDay } from './sorting.js';
 
 function createDestinations(destinations) {
   let trip = '';

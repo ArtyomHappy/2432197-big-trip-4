@@ -1,10 +1,10 @@
-import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { humanizeDateTime } from '../utils/point';
-import { getLastWord, raiseFirstChar } from '../utils/common';
-import FlatPicker from './date-selection.js';
-import { POINT_TYPES, EmptyPoint, EditingType } from '../constants';
-import dayjs from 'dayjs';
 import he from 'he';
+import dayjs from 'dayjs';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
+import FlatPicker from './date-selection.js';
+import { getLastWord, raiseFirstChar } from '../utils/common.js';
+import { humanizeDateTime } from '../utils/point.js';
+import { POINT_TYPES, EmptyPoint, EditingType } from '../constants.js';
 
 function createDestinationsTemplate(destination) {
   const { description, pictures, name } = destination;

@@ -1,14 +1,14 @@
 import { RenderPosition, render, remove } from '../framework/render.js';
-import { sortByPrice, sortByTime, sortByDay } from '../utils/sort.js';
-import { filter } from '../utils/filter.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 import TripPointPresenter from './trip-point-presenter.js';
 import NewTripPointPresenter from './new-trip-point-presenter.js';
 import Sorting from '../view/sorting.js';
 import EmptyList from '../view/empty-list.js';
 import Loading from '../view/loading.js';
 import Error from '../view/error.js';
+import { sortByPrice, sortByTime, sortByDay } from '../utils/sorting.js';
+import { filter } from '../utils/filter.js';
 import { TimeLimits, SortingType, FilterType, UpdateType, UserAction } from '../constants.js';
-import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 export default class TripPresenter {
   #container = null;
